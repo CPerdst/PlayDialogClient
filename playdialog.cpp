@@ -20,7 +20,6 @@ PlayDialog::~PlayDialog()
 void PlayDialog::on_pb_start_clicked()
 {
     p_mediaPlayer->start();
-    p_mediaPlayer->wait();
 }
 
 void PlayDialog::SLT_recvImage(QImage image){
