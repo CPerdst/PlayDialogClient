@@ -9,6 +9,16 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class PlayDialog; }
 QT_END_NAMESPACE
 
+extern "C"
+{
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavutil/pixfmt.h"
+#include "libswscale/swscale.h"
+#include "libavformat/avformat.h"
+#include "libavdevice/avdevice.h"
+}
+
 class PlayDialog : public QMainWindow
 {
     Q_OBJECT
