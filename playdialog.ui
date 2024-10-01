@@ -19,8 +19,8 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>381</width>
-      <height>241</height>
+      <width>641</width>
+      <height>401</height>
      </rect>
     </property>
     <property name="text">
@@ -30,8 +30,8 @@
    <widget class="QPushButton" name="pb_start">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>330</y>
+      <x>10</x>
+      <y>460</y>
       <width>56</width>
       <height>17</height>
      </rect>
@@ -47,7 +47,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>18</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

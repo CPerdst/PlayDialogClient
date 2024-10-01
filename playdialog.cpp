@@ -20,10 +20,11 @@ PlayDialog::~PlayDialog()
 void PlayDialog::on_pb_start_clicked()
 {
     p_mediaPlayer->start();
+    p_mediaPlayer->wait();
 }
 
 void PlayDialog::SLT_recvImage(QImage image){
-    qDebug() << __func__ << "\n";
+//    qDebug() << __func__ << "\n";
     const QPixmap pixmap = QPixmap::fromImage(image.scaled(ui->lb_show->width(), ui->lb_show->height(), Qt::KeepAspectRatio));
     ui->lb_show->setPixmap(pixmap);
 }

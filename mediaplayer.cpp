@@ -89,6 +89,9 @@ void MediaPlayer::run(){
     uint8_t* out_buffer = (uint8_t*)av_malloc(numBytes * sizeof(uint8_t));
     avpicture_fill((AVPicture*)frameRGB, out_buffer, AV_PIX_FMT_RGB32, videoCodecCtx->width, videoCodecCtx->height);
 
+    auto begin_time = av_gettime();
+    int64_t pts = 0;
+
     // 开始循环获取文件中的packet
     int ret, got_picture;
     while(true){
@@ -101,6 +104,14 @@ void MediaPlayer::run(){
                 qDebug() << "decode video frame error\n";
                 return;
             }
+            pts = frame->pts = frame->best_effort_timestamp;
+            pts *= 1000000 * av_q2d(formatContext->streams[video_stream_index]->time_base);
+            int64_t real_time = av_gettime() - begin_time;
+            while(pts > real_time){
+                msleep(10);
+                real_time = av_gettime() - begin_time;
+            }
+
             if(got_picture){
                 sws_scale(image_convert_context, (uint8_t const * const *)frame->data,
                           frame->linesize, 0, videoCodecCtx->height,
@@ -113,7 +124,6 @@ void MediaPlayer::run(){
         }else{
             av_free_packet(packet);
         }
-        msleep(5);
     }
 
     av_free(frame);

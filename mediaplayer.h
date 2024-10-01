@@ -13,6 +13,7 @@ extern "C"
 #include "libswscale/swscale.h"
 #include "libavformat/avformat.h"
 #include "libavdevice/avdevice.h"
+#include "libavutil/time.h"
 }
 
 class MediaPlayer : public QThread {
