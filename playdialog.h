@@ -2,6 +2,8 @@
 #define PLAYDIALOG_H
 
 #include <QMainWindow>
+#include "mediaplayer.h"
+#include "QImage"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class PlayDialog; }
@@ -15,7 +17,12 @@ public:
     PlayDialog(QWidget *parent = nullptr);
     ~PlayDialog();
 
+private slots:
+    void on_pb_start_clicked();
+    void SLT_recvImage(QImage image);
+
 private:
     Ui::PlayDialog *ui;
+    MediaPlayer* p_mediaPlayer;
 };
 #endif // PLAYDIALOG_H
