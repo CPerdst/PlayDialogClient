@@ -11,10 +11,12 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mediaplayer.cpp \
+    packetqueue.cpp \
     playdialog.cpp
 
 HEADERS += \
     mediaplayer.h \
+    packetqueue.h \
     playdialog.h
 
 FORMS += \

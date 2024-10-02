@@ -40,9 +40,13 @@ void MediaPlayer::run(){
         return;
     }
 
+    // 打印一下媒体文件信息
+    av_dump_format(formatContext, 0, path, false);
+
     int video_stream_index = -1;
     int audio_stream_index = -1;
 
+    // 查找音频视频流上下文信息
     find_stream_form_context(formatContext, &video_stream_index, &audio_stream_index);
 
     if(video_stream_index == -1){
