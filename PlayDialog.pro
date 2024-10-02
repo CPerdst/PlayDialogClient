@@ -21,7 +21,8 @@ FORMS += \
     playdialog.ui
 
 INCLUDEPATH += \
-    D:\Qt\QtAPP\PlayDialog\ffmpeg-4.2.2\include
+    D:\Qt\QtAPP\PlayDialog\ffmpeg-4.2.2\include\
+    D:\Qt\QtAPP\PlayDialog\SDL2-2.0.10\include
 
 LIBS += \
     $$PWD/ffmpeg-4.2.2/lib/avcodec.lib\
@@ -32,6 +33,7 @@ LIBS += \
     $$PWD/ffmpeg-4.2.2/lib/postproc.lib\
     $$PWD/ffmpeg-4.2.2/lib/swresample.lib\
     $$PWD/ffmpeg-4.2.2/lib/swscale.lib\
+    $$PWD/SDL2-2.0.10/lib/x86/SDL2.lib
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -5,8 +5,10 @@
 #include <QImage>
 #include <QString>
 
+#ifdef __cplusplus
 extern "C"
 {
+#endif
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavutil/pixfmt.h"
@@ -14,7 +16,11 @@ extern "C"
 #include "libavformat/avformat.h"
 #include "libavdevice/avdevice.h"
 #include "libavutil/time.h"
+#include "SDL.h"
+#ifdef __cplusplus
 }
+#endif
+
 
 class MediaPlayer : public QThread {
 Q_OBJECT
