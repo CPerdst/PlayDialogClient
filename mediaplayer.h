@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QImage>
 #include <QString>
+#include "packetqueue.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -16,6 +17,7 @@ extern "C"
 #include "libavformat/avformat.h"
 #include "libavdevice/avdevice.h"
 #include "libavutil/time.h"
+#include "libswresample/swresample.h"
 #include "SDL.h"
 #ifdef __cplusplus
 }
@@ -30,9 +32,13 @@ signals:
 public:
     MediaPlayer();
     void run();
+    static void audio_callback(void* userdata, uint8_t* stream, int len);
 
 private:
     void find_stream_form_context(AVFormatContext* context, int* video_stream, int* audio_stream);
+
+public:
+    static PacketQueue* audioQueue;
 
 private:
     QString m_filePath;

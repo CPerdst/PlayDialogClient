@@ -1,6 +1,8 @@
 #include "mediaplayer.h"
 #include "QDebug"
 
+PacketQueue* audioQueue = new PacketQueue{};
+
 MediaPlayer::MediaPlayer(){
 
 }
@@ -66,7 +68,7 @@ void MediaPlayer::run(){
         return;
     }
 
-    // 打开解码器
+    // 打开视频解码器
     res = avcodec_open2(videoCodecCtx, videoCodec, NULL);
     if(res < 0){
         qDebug() << "video codec open failed\n";
@@ -75,8 +77,59 @@ void MediaPlayer::run(){
         return;
     }
 
-    // 开始提取视频包
+    // 查找音频解码器
+    AVCodecContext* audioCodecCtx = formatContext->streams[audio_stream_index]->codec;
+    AVCodec* audioCodec = avcodec_find_decoder(audioCodecCtx->codec_id);
+    if(!audioCodec){
+        qDebug() << "can not find audio codec\n";
+        avformat_close_input(&formatContext);
+        avformat_free_context(formatContext);
+        return;
+    }
 
+    // 打开音频解码器
+    res = avcodec_open2(audioCodecCtx, audioCodec, NULL);
+    if(res < 0){
+        qDebug() << "audio codec open failed\n";
+        avcodec_close(videoCodecCtx);
+        avformat_close_input(&formatContext);
+        avformat_free_context(formatContext);
+        return;
+    }
+
+    // 设置期望音频设备配置
+    SDL_AudioSpec wantedSpec;
+    SDL_AudioSpec Spec;
+    wantedSpec.freq = audioCodecCtx->sample_rate;
+    wantedSpec.silence = 0;
+    wantedSpec.samples = 1024;
+    wantedSpec.channels = audioCodecCtx->channels;
+    switch (audioCodecCtx->sample_fmt) {
+        case AV_SAMPLE_FMT_S16:
+            wantedSpec.format = AUDIO_S16SYS;
+            break;
+        case AV_SAMPLE_FMT_S32:
+            wantedSpec.format = AUDIO_F32SYS;
+            break;
+        default:
+            wantedSpec.format = AUDIO_S16SYS;
+            break;
+    }
+    wantedSpec.callback = MediaPlayer::audio_callback;
+    wantedSpec.userdata = audioCodecCtx;
+
+    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wantedSpec, &Spec, 0);
+    if(deviceId < 0){
+        qDebug() << "could not open device  id: " << deviceId << "\n";
+        return;
+    }
+
+    AVFrame* wantedFrame = av_frame_alloc();
+
+
+
+
+    // 开始提取视频包
     AVPacket* packet;
     AVFrame* frame, *frameRGB;
     frame = av_frame_alloc();
@@ -103,26 +156,27 @@ void MediaPlayer::run(){
             break;
         }
         if(packet->stream_index == video_stream_index){
-            ret = avcodec_decode_video2(videoCodecCtx, frame, &got_picture, packet);
-            if(ret < 0){
-                qDebug() << "decode video frame error\n";
-                return;
-            }
-            pts = frame->pts = frame->best_effort_timestamp;
-            pts *= 1000000 * av_q2d(formatContext->streams[video_stream_index]->time_base);
-            int64_t real_time = av_gettime() - begin_time;
-            while(pts > real_time){
-                msleep(10);
-                real_time = av_gettime() - begin_time;
-            }
+            av_free_packet(packet);
+//            ret = avcodec_decode_video2(videoCodecCtx, frame, &got_picture, packet);
+//            if(ret < 0){
+//                qDebug() << "decode video frame error\n";
+//                return;
+//            }
+//            pts = frame->pts = frame->best_effort_timestamp;
+//            pts *= 1000000 * av_q2d(formatContext->streams[video_stream_index]->time_base);
+//            int64_t real_time = av_gettime() - begin_time;
+//            while(pts > real_time){
+//                msleep(10);
+//                real_time = av_gettime() - begin_time;
+//            }
 
-            if(got_picture){
-                sws_scale(image_convert_context, (uint8_t const * const *)frame->data,
-                          frame->linesize, 0, videoCodecCtx->height,
-                          frameRGB->data, frameRGB->linesize);
-                QImage tmpImage = QImage((uchar*)out_buffer, videoCodecCtx->width, videoCodecCtx->height, QImage::Format_RGB32);
-                Q_EMIT SIG_sendImage(tmpImage);
-            }
+//            if(got_picture){
+//                sws_scale(image_convert_context, (uint8_t const * const *)frame->data,
+//                          frame->linesize, 0, videoCodecCtx->height,
+//                          frameRGB->data, frameRGB->linesize);
+//                QImage tmpImage = QImage((uchar*)out_buffer, videoCodecCtx->width, videoCodecCtx->height, QImage::Format_RGB32);
+//                Q_EMIT SIG_sendImage(tmpImage);
+//            }
         }else if(packet->stream_index == audio_stream_index){
             av_free_packet(packet);
         }else{
@@ -138,6 +192,13 @@ void MediaPlayer::run(){
 
 
 
+}
+
+void MediaPlayer::audio_callback(void *userdata, uint8_t *stream, int len)
+{
+    AVCodecContext* audioCodecCtx = (AVCodecContext*)userdata;
+    qDebug() << len << "\n";
+    return;
 }
 
 
